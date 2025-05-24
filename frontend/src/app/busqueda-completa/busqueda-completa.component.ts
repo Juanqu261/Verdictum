@@ -1,12 +1,14 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-busqueda-completa',
   templateUrl: './busqueda-completa.component.html',
   standalone: true,
-  imports: [FormsModule, CommonModule]
+  imports: [FormsModule, CommonModule, HttpClientModule]
 })
 export class BusquedaCompletaComponent {
   tipoPersona: string = '';
@@ -18,6 +20,8 @@ export class BusquedaCompletaComponent {
   despacho: string = '';
 
   showNoCiudadMsg = false;
+  loading = false;
+  error: string | null = null;
 
   departamentos: string[] = [
     'Amazonas', 'Antioquia', 'Arauca', 'Atlántico', 'Bogotá D.C.', 'Bolívar', 'Boyacá', 'Caldas', 'Caquetá', 'Casanare',
@@ -62,6 +66,8 @@ export class BusquedaCompletaComponent {
     'Vichada': ['Puerto Carreño']
   };
 
+  constructor(private http: HttpClient, private router: Router) {}
+
   get ciudades(): string[] {
     return this.ciudadesPorDepartamento[this.departamento] || [];
   }
@@ -80,9 +86,24 @@ export class BusquedaCompletaComponent {
   }
 
   buscar() {
-    // Lógica de búsqueda
-    alert(
-      `Tipo de Persona: ${this.tipoPersona}\nNombre: ${this.nombre}\nDepartamento: ${this.departamento}\nCiudad: ${this.ciudad}\nEntidad: ${this.entidad}\nEspecialidad: ${this.especialidad}\nDespacho: ${this.despacho}`
-    );
+    this.loading = true;
+    this.error = null;
+    // API quemada, luego se parametriza
+    const url = 'https://consultaprocesos.ramajudicial.gov.co:448/api/v2/Procesos/Consulta/NombreRazonSocial?nombre=Falabella&tipoPersona=jur&SoloActivos=true&codificacionDespacho=05001&pagina=1';
+    this.http.get<any>(url).subscribe({
+      next: (resp) => {
+        this.loading = false;
+        if (resp && resp.procesos && resp.procesos.length > 0) {
+          // Navega a la vista de detalle, pasando todos los procesos por state
+          this.router.navigate(['/detalle-proceso'], { state: { procesos: resp.procesos } });
+        } else {
+          this.error = 'No se encontraron procesos para los datos ingresados.';
+        }
+      },
+      error: () => {
+        this.loading = false;
+        this.error = 'Error al consultar los procesos. Intente nuevamente.';
+      }
+    });
   }
 }
