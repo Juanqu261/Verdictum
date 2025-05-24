@@ -10,14 +10,46 @@
     Completa los siguientes datos para realizar una búsqueda detallada.
   </p>
   <form (ngSubmit)="buscar()" style="width:100%;max-width:340px;">
-    <label for="nombre">Nombre:</label>
-    <input id="nombre" [(ngModel)]="nombre" name="nombre" placeholder="Ej: Juan Pérez" required />
+    <!-- Tipo de Persona -->
+    <label for="tipoPersona">Tipo de Persona: <span style="color:#d32f2f">*</span></label>
+    <select id="tipoPersona" [(ngModel)]="tipoPersona" name="tipoPersona" required>
+      <option value="" disabled selected>Seleccione tipo</option>
+      <option value="natural">Natural</option>
+      <option value="juridica">Jurídica</option>
+    </select>
 
+    <!-- Nombre(s) Apellido o Razón social -->
+    <label for="nombre">Nombre(s) Apellido o Razón social: <span style="color:#d32f2f">*</span></label>
+    <input id="nombre" [(ngModel)]="nombre" name="nombre" placeholder="Ej: Juan Pérez o Empresa S.A." required />
+
+    <!-- Departamento -->
     <label for="departamento">Departamento:</label>
-    <input id="departamento" [(ngModel)]="departamento" name="departamento" placeholder="Ej: Cundinamarca" required />
+    <select id="departamento" [(ngModel)]="departamento" name="departamento" (change)="onDepartamentoChange()">
+      <option value="" selected>Seleccione departamento</option>
+      <option *ngFor="let dep of departamentos" [value]="dep">{{ dep }}</option>
+    </select>
 
-    <label for="ciudad">Ciudad:</label>
-    <input id="ciudad" [(ngModel)]="ciudad" name="ciudad" placeholder="Ej: Bogotá" required />
+    <!-- Ciudad -->
+    <label for="ciudad">Ciudad/Municipio:</label>
+    <select id="ciudad" [(ngModel)]="ciudad" name="ciudad" [disabled]="!departamento || ciudades.length === 0" (click)="onCiudadClick()">
+      <option value="" selected>Seleccione ciudad o municipio</option>
+      <option *ngFor="let c of ciudades" [value]="c">{{ c }}</option>
+    </select>
+    <div *ngIf="showNoCiudadMsg" style="color:#d32f2f; font-size:0.95em; margin-bottom:0.5em;">
+      No hay datos disponibles porque no se escogió departamento.
+    </div>
+
+    <!-- Entidad -->
+    <label for="entidad">Entidad:</label>
+    <input id="entidad" [(ngModel)]="entidad" name="entidad" placeholder="Ej: Rama Judicial" />
+
+    <!-- Especialidad -->
+    <label for="especialidad">Especialidad:</label>
+    <input id="especialidad" [(ngModel)]="especialidad" name="especialidad" placeholder="Ej: Civil, Penal, etc." />
+
+    <!-- Despacho -->
+    <label for="despacho">Despacho:</label>
+    <input id="despacho" [(ngModel)]="despacho" name="despacho" placeholder="Ej: Juzgado 1 Civil Municipal" />
 
     <button type="submit" style="width:100%;margin-top:1.5em;">Buscar</button>
   </form>
