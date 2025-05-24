@@ -23,6 +23,7 @@ func main() {
 
 	r := mux.NewRouter()
 	r.HandleFunc("/process/{radicado}", handlers.ProcessHandler)
+	r.HandleFunc("/actuaciones/{id}", handlers.ActuacionesHandler)
 
 	log.Printf("Gateway corriendo en http://localhost:%s\n", port)
 	log.Fatal(http.ListenAndServe(":"+port, r))
