@@ -44,7 +44,13 @@
           <td style="padding:8px;border:1px solid #ccc;">{{ act.fechaRegistro | date:'yyyy-MM-dd' }}</td>
           <td style="padding:8px;border:1px solid #ccc;text-align:center;">
             <ng-container *ngIf="act.conDocumentos; else noDoc">
-              <a [href]="getDocumentoLink(act)" target="_blank" style="color:#1976d2;text-decoration:underline;">Ver documento</a>
+              <button (click)="descargarDocumento(act)" [disabled]="descargandoDocumento[act.idRegActuacion]" style="background:#1976d2; color:#fff; border:none; border-radius:6px; padding:0.4em 0.8em; font-size:0.9em; cursor:pointer;">
+                <span *ngIf="!descargandoDocumento[act.idRegActuacion]">Ver documento</span>
+                <span *ngIf="descargandoDocumento[act.idRegActuacion]">Descargando...</span>
+              </button>
+              <div *ngIf="errorDescarga[act.idRegActuacion]" style="color:#d32f2f; font-size:0.85em; margin-top:0.3em;">
+                {{ errorDescarga[act.idRegActuacion] }}
+              </div>
             </ng-container>
             <ng-template #noDoc>
               <span style="color:#888;">no disponible</span>

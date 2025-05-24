@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Location } from '@angular/common';
 import { Router, Navigation } from '@angular/router';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HttpClient, HttpClientModule, HttpErrorResponse } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -18,6 +18,8 @@ export class ActuacionesComponent {
   idProceso: number | null = null;
   llaveProceso: string | null = null;
   soloConDocumentos = false;
+  descargandoDocumento: { [idRegActuacion: number]: boolean } = {};
+  errorDescarga: { [idRegActuacion: number]: string | null } = {};
 
   constructor(private location: Location, private router: Router, private http: HttpClient) {
     const nav: Navigation | null = this.router.getCurrentNavigation();
@@ -58,11 +60,53 @@ export class ActuacionesComponent {
       : this.actuaciones;
   }
 
-  getDocumentoLink(act: any): string | null {
-    // El id para el link de descarga es act.idRegActuacion
-    return act.conDocumentos
-      ? `https://consultaprocesos.ramajudicial.gov.co:448/api/v2/Descarga/Documento/${act.idRegActuacion}`
-      : null;
+  getDocumentoLink(act: any): string {
+    return `https://consultaprocesos.ramajudicial.gov.co:448/api/v2/Descarga/Documento/${act.idRegActuacion}`;
+  }
+
+  descargarDocumento(actuacion: any) {
+    if (!actuacion.conDocumentos) return;
+
+    const idReg = actuacion.idRegActuacion;
+    this.descargandoDocumento[idReg] = true;
+    this.errorDescarga[idReg] = null;
+
+    const url = this.getDocumentoLink(actuacion);
+
+    this.http.get(url, { responseType: 'blob', observe: 'response' }).subscribe({
+      next: (response) => {
+        this.descargandoDocumento[idReg] = false;
+        
+        // Intentar obtener el nombre del archivo del header Content-Disposition
+        let filename = `documento_${idReg}.pdf`; // Nombre por defecto
+        const contentDisposition = response.headers.get('Content-Disposition');
+        if (contentDisposition) {
+          const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+          const matches = filenameRegex.exec(contentDisposition);
+          if (matches != null && matches[1]) {
+            filename = matches[1].replace(/['"]/g, '');
+          }
+        }
+
+        const blob = new Blob([response.body as BlobPart], { type: response.headers.get('Content-Type') || 'application/octet-stream' });
+        const downloadLink = document.createElement('a');
+        downloadLink.href = window.URL.createObjectURL(blob);
+        downloadLink.setAttribute('download', filename);
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+        window.URL.revokeObjectURL(downloadLink.href);
+      },
+      error: (err: HttpErrorResponse) => {
+        this.descargandoDocumento[idReg] = false;
+        if (err.status === 500) {
+          this.errorDescarga[idReg] = 'El documento no está disponible para descarga directa o requiere autenticación en el portal de la Rama Judicial.';
+        } else {
+          this.errorDescarga[idReg] = `Error al descargar (${err.status}): ${err.message}. Intente acceder desde el portal oficial.`;
+        }
+        console.error('Error al descargar documento:', err);
+      }
+    });
   }
 
   volver() {
