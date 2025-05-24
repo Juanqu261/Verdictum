@@ -1,0 +1,17 @@
+<div class="container">
+  <div class="logo">
+    <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+      <circle cx="24" cy="24" r="24" fill="#1976d2"/>
+      <text x="50%" y="58%" text-anchor="middle" fill="#fff" font-size="22" font-family="Segoe UI, Arial" font-weight="bold" dy=".3em">🔎</text>
+    </svg>
+  </div>
+  <h2>Búsqueda por radicado</h2>
+  <p style="color:#444; margin-bottom:1.5em;">
+    Ingresa el número de radicado para consultar el proceso judicial.
+  </p>
+  <form (ngSubmit)="buscar()" style="width:100%;max-width:320px;">
+    <label for="radicado">Radicado:</label>
+    <input id="radicado" [(ngModel)]="radicado" name="radicado" placeholder="Ej: 11001-31-10-001-2023-00001-00" required />
+    <button type="submit" style="width:100%;margin-top:1.5em;">Buscar</button>
+  </form>
+</div>
