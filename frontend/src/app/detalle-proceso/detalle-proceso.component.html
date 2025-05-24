@@ -1,0 +1,25 @@
+<div class="container" *ngIf="proceso; else sinDatos">
+  <div class="logo">
+    <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+      <circle cx="24" cy="24" r="24" fill="#1976d2"/>
+      <text x="50%" y="58%" text-anchor="middle" fill="#fff" font-size="22" font-family="Segoe UI, Arial" font-weight="bold" dy=".3em">📄</text>
+    </svg>
+  </div>
+  <h2>Detalle del Proceso</h2>
+  <div style="text-align:left; margin: 0 auto; max-width: 400px;">
+    <p><strong>Número de Radicado:</strong> {{ proceso.llaveProceso }}</p>
+    <p><strong>ID Proceso:</strong> {{ proceso.idProceso }}</p>
+    <p><strong>Fecha Proceso:</strong> {{ proceso.fechaProceso | date:'yyyy-MM-dd' }}</p>
+    <p><strong>Fecha Última Actualización:</strong> {{ proceso.fechaUltimaActuacion | date:'yyyy-MM-dd' }}</p>
+    <p><strong>Despacho:</strong> {{ proceso.despacho }}</p>
+    <p><strong>Departamento:</strong> {{ proceso.departamento }}</p>
+    <p><strong>Sujetos Procesales:</strong> {{ proceso.sujetosProcesales }}</p>
+  </div>
+  <button (click)="volver()" style="margin-top:2em;">Volver</button>
+</div>
+<ng-template #sinDatos>
+  <div class="container">
+    <h2>No hay datos para mostrar</h2>
+    <button (click)="volver()">Volver</button>
+  </div>
+</ng-template>
