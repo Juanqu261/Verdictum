@@ -1,0 +1,64 @@
+<div class="container" style="max-width:1100px;">
+  <div class="logo" style="margin-bottom:0;">
+    <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+      <circle cx="24" cy="24" r="24" fill="#1976d2"/>
+      <text x="50%" y="58%" text-anchor="middle" fill="#fff" font-size="22" font-family="Segoe UI, Arial" font-weight="bold" dy=".3em">📑</text>
+    </svg>
+  </div>
+  <h2 style="margin-bottom:2em;">Actuaciones del Proceso</h2>
+  <div *ngIf="llaveProceso" style="margin-bottom:1em; color:#1976d2; font-weight:600;">
+    Proceso: {{ llaveProceso }}
+  </div>
+  <div style="text-align:right;margin-bottom:0.5em;">
+    <label>
+      <input type="checkbox" [(ngModel)]="soloConDocumentos" />
+      Mostrar solo actuaciones con documentos
+    </label>
+  </div>
+  <div *ngIf="loading" style="margin-top:1em;color:#1976d2;">Consultando actuaciones...</div>
+  <div *ngIf="error" style="margin-top:1em;color:#d32f2f;">{{ error }}</div>
+  <div *ngIf="!loading && !error && actuacionesFiltradas.length > 0" style="overflow-x:auto;">
+    <table style="width:100%;border-collapse:collapse;">
+      <thead>
+        <tr style="background:#e3e8ee;">
+          <th style="padding:8px;border:1px solid #ccc;">ID Reg Actuación</th>
+          <th style="padding:8px;border:1px solid #ccc;">Cons. Actuación</th>
+          <th style="padding:8px;border:1px solid #ccc;">Fecha Actuación</th>
+          <th style="padding:8px;border:1px solid #ccc;">Actuación</th>
+          <th style="padding:8px;border:1px solid #ccc;">Anotación</th>
+          <th style="padding:8px;border:1px solid #ccc;">Fecha Inicial</th>
+          <th style="padding:8px;border:1px solid #ccc;">Fecha Final</th>
+          <th style="padding:8px;border:1px solid #ccc;">Fecha Registro</th>
+          <th style="padding:8px;border:1px solid #ccc;">Documento</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let act of actuacionesFiltradas">
+          <td style="padding:8px;border:1px solid #ccc;">{{ act.idRegActuacion }}</td>
+          <td style="padding:8px;border:1px solid #ccc;">{{ act.consActuacion }}</td>
+          <td style="padding:8px;border:1px solid #ccc;">{{ act.fechaActuacion | date:'yyyy-MM-dd' }}</td>
+          <td style="padding:8px;border:1px solid #ccc;">{{ act.actuacion }}</td>
+          <td style="padding:8px;border:1px solid #ccc;">{{ act.anotacion }}</td>
+          <td style="padding:8px;border:1px solid #ccc;">{{ act.fechaInicial ? (act.fechaInicial | date:'yyyy-MM-dd') : '-' }}</td>
+          <td style="padding:8px;border:1px solid #ccc;">{{ act.fechaFinal ? (act.fechaFinal | date:'yyyy-MM-dd') : '-' }}</td>
+          <td style="padding:8px;border:1px solid #ccc;">{{ act.fechaRegistro | date:'yyyy-MM-dd' }}</td>
+          <td style="padding:8px;border:1px solid #ccc;text-align:center;">
+            <ng-container *ngIf="act.conDocumentos; else noDoc">
+              <button (click)="descargarDocumento(act)" [disabled]="descargandoDocumento[act.idRegActuacion]" style="background:#1976d2; color:#fff; border:none; border-radius:6px; padding:0.4em 0.8em; font-size:0.9em; cursor:pointer;">
+                <span *ngIf="!descargandoDocumento[act.idRegActuacion]">Ver documento</span>
+                <span *ngIf="descargandoDocumento[act.idRegActuacion]">Descargando...</span>
+              </button>
+              <div *ngIf="errorDescarga[act.idRegActuacion]" style="color:#d32f2f; font-size:0.85em; margin-top:0.3em;">
+                {{ errorDescarga[act.idRegActuacion] }}
+              </div>
+            </ng-container>
+            <ng-template #noDoc>
+              <span style="color:#888;">no disponible</span>
+            </ng-template>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <button (click)="volver()" style="margin-top:2em;">Volver</button>
+</div>
