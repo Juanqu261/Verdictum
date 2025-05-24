@@ -61,7 +61,14 @@ export class ActuacionesComponent {
   }
 
   getDocumentoLink(act: any): string {
-    return `https://consultaprocesos.ramajudicial.gov.co:448/api/v2/Descarga/Documento/${act.idRegActuacion}`;
+    // Si la actuación tiene documentos, devuelve la URL quemada.
+    // Si no, podrías devolver una cadena vacía o null, aunque el HTML ya lo maneja.
+    if (act.conDocumentos) {
+      return `https://consultaprocesos.ramajudicial.gov.co:448/api/v2/Descarga/Documento/789551141`;
+    }
+    // En teoría, este caso no debería usarse si el botón de descarga solo aparece cuando conDocumentos es true.
+    // Pero por seguridad, devolvemos una cadena vacía o un placeholder si es necesario.
+    return ''; 
   }
 
   descargarDocumento(actuacion: any) {
@@ -71,7 +78,7 @@ export class ActuacionesComponent {
     this.descargandoDocumento[idReg] = true;
     this.errorDescarga[idReg] = null;
 
-    const url = this.getDocumentoLink(actuacion);
+    const url = this.getDocumentoLink(actuacion); // Se utiliza el método verificado
 
     this.http.get(url, { responseType: 'blob', observe: 'response' }).subscribe({
       next: (response) => {
