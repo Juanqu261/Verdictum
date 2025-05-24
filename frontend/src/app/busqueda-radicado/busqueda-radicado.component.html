@@ -11,7 +11,9 @@
   </p>
   <form (ngSubmit)="buscar()" style="width:100%;max-width:320px;">
     <label for="radicado">Radicado:</label>
-    <input id="radicado" [(ngModel)]="radicado" name="radicado" placeholder="Ej: 11001-31-10-001-2023-00001-00" required />
-    <button type="submit" style="width:100%;margin-top:1.5em;">Buscar</button>
+    <input id="radicado" [(ngModel)]="radicado" name="radicado" placeholder="Ej: 05001418900820250032700" required />
+    <button type="submit" style="width:100%;margin-top:1.5em;" [disabled]="loading">Buscar</button>
   </form>
+  <div *ngIf="loading" style="margin-top:1em;color:#1976d2;">Consultando proceso...</div>
+  <div *ngIf="error" style="margin-top:1em;color:#d32f2f;">{{ error }}</div>
 </div>
